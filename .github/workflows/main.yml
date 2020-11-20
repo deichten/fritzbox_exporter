@@ -1,0 +1,28 @@
+name: MultiArch Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v2
+      - name: install buildx
+        id: buildx
+        uses: crazy-max/ghaction-docker-buildx@v1
+        with:
+          version: latest
+      - name: build the image
+        run: |
+          docker buildx build \
+            --tag deichten/fritzbox_exporter:latest \
+            --output "type=image,push=true" \ 
+            --platform linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64 .
