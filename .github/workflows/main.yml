@@ -12,17 +12,38 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      DOCKER_REGISTRY: quay.io
+      DOCKER_IMAGE: deichten/fritzbox_exporter
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      DOCKER_TARGET_PLATFORM: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64
+      
     steps:
-      - name: checkout code
-        uses: actions/checkout@v2
-      - name: install buildx
-        id: buildx
-        uses: crazy-max/ghaction-docker-buildx@v1
-        with:
-          version: latest
-      - name: build the image
+      - name: Checkout code
+        uses: actions/checkout@v2.3.3
+
+      - name: Setup Docker BuildX
+        uses: crazy-max/ghaction-docker-buildx@v3.3.1
+
+      - name: Prepare
+        if: success()
+        id: prepare
+        run: |
+          echo ::set-output name=docker_platform::${DOCKER_TARGET_PLATFORM}
+          echo ::set-output name=docker_image::${DOCKER_REGISTRY}/${DOCKER_IMAGE}
+          echo ::set-output name=version::${GITHUB_RUN_NUMBER}
+          
+      - name: Docker Login
+        if: success()
+        run: |
+          echo "${DOCKER_PASSWORD}" | docker login ${DOCKER_REGISTRY} --username "${DOCKER_USERNAME}" --password-stdin          
+          
+      - name: Run Buildx
+        if: success()
         run: |
           docker buildx build \
-            --tag deichten/fritzbox_exporter:latest \
-            --output "type=image,push=true" \ 
-            --platform linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64 .
+          --platform ${{ steps.prepare.outputs.docker_platform }} \
+          --tag ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }} \
+          --file ./Dockerfile \
+          --output type=image,push=true .
