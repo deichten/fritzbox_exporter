@@ -17,10 +17,10 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"net/http"
 	"sync"
 	"time"
-	"log"
 
 	"github.com/prometheus/client_golang/prometheus"
 
@@ -102,6 +102,30 @@ var metrics = []*Metric{
 			nil,
 		),
 		MetricType: prometheus.CounterValue,
+	},
+	{
+		Service: "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1",
+		Action:  "GetAddonInfos",
+		Result:  "ByteSendRate",
+		Desc: prometheus.NewDesc(
+			"gateway_wan_bytes_send_rate",
+			"byte send rate on gateway WAN interface",
+			[]string{"gateway"},
+			nil,
+		),
+		MetricType: prometheus.GaugeValue,
+	},
+	{
+		Service: "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1",
+		Action:  "GetAddonInfos",
+		Result:  "ByteReceiveRate",
+		Desc: prometheus.NewDesc(
+			"gateway_wan_bytes_receive_rate",
+			"byte receive rate on gateway WAN interface",
+			[]string{"gateway"},
+			nil,
+		),
+		MetricType: prometheus.GaugeValue,
 	},
 	{
 		Service: "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1",
