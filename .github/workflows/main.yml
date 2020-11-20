@@ -17,7 +17,7 @@ jobs:
       DOCKER_IMAGE: deichten/fritzbox-exporter
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-      DOCKER_TARGET_PLATFORM: linux/arm/v6,linux/arm/v7,linux/amd64
+      DOCKER_TARGET_PLATFORM: linux/arm/v7
       
     steps:
       - name: Checkout code
