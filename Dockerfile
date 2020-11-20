@@ -1,11 +1,12 @@
-FROM golang:1.15-alpine AS builder
+FROM --platform=${BUILDPLATFORM} golang:1.15-alpine AS builder
 
 WORKDIR /build
 COPY . /build/
-
 ENV CGO_ENABLED=0
 
-RUN go build -v .
+ARG TARGETOS
+ARG TARGETARCH
+RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -v .
 
 FROM scratch
 
