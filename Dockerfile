@@ -7,9 +7,9 @@ ENV CGO_ENABLED=0
 
 RUN go build -v .
 
-FROM busybox
+FROM scratch
 
 COPY --from=builder /build/fritzbox_exporter /usr/local/bin/fritzbox_exporter
 
 EXPOSE 9133
-ENTRYPOINT /usr/local/bin/fritzbox_exporter
+ENTRYPOINT ["/usr/local/bin/fritzbox_exporter"]
